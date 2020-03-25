@@ -16,6 +16,10 @@ class Die:
 
     def roll(self):
         self.value = int(random.random() * 6 + 1)
+    
+    def val(self):
+        return self.value
+
 
     def show(self):
         if self.value == 1:
@@ -30,6 +34,7 @@ class Die:
             return("---------\n|*     *|\n|   *   |\n|*     *|\n---------")
         else:
             return("---------\n|*     *|\n|*     *|\n|*     *|\n---------")
+
 
     @classmethod
     def create_dice(cls, n):
