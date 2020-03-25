@@ -23,10 +23,11 @@ class GameRunner:
         # Probably counts wins or something.
         # Great variable name, 10/10.
         c = 0
+        d = 0
         while True:
             runner = cls()
 
-            print("Round {}\n".format(runner.round))
+            print("Round {}\n".format(c + d))
 
             for die in runner.dice:
                 print(die.show())
@@ -42,9 +43,9 @@ class GameRunner:
                 print("Sorry that's wrong")
                 print("The answer is: {}".format(runner.answer()))
                 print("Like seriously, how could you mess that up")
-                runner.loses += 1
+                d += 1
                 c += 0
-            print("Wins: {} Loses {}".format(runner.wins, runner.loses))
+            print("Wins: {} Loses {}".format(c, d))
             runner.round += 1
 
             if c == 6:
