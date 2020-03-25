@@ -1,0 +1,361 @@
+---
+title: "Results EC50 assay 2 for MTZ 9-11.8.19"
+author: "Sascha Krakovka"
+#date: "`r Sys.Date()`"
+output: 
+html_notebook:
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    number_sections: true
+    df_print: paged
+    code_folding: hide
+    fig_width: 6
+    fig_height: 6
+---
+
+
+```{r , include=FALSE}
+#Call for the needed libraries in order of usage
+library(tidyverse)
+library(DT)
+library(modelr)
+options(na.action = na.warn)
+library(knitr)
+opts_knit$set(progress = FALSE, verbose = FALSE)
+opts_chunk$set(warning=FALSE, message=FALSE, echo=FALSE)
+library(tinytex)
+```
+#THIS IS THE NEW SETUP
+#Introduction
+#####25.3.19
+I chose to give every concentration a DMSO control with the same amount DMSO.
+
+#Experiment set-up - IC50 measurement
+#####26.3.19
+1. Chill trophozoits on ice for 15min, detach by hitting
+2. Enumerate cells in Neubauer chamber (average x2x10 000) 
+3. Dilute to 10 cells/?l (=$1*10^{4} cells/ml$) for WB and C60.5, 20 cells/?l (=$2*10^{4} cells/ml$) for C6a! and C60.5
+4. Seed with 40?l of these in 2 96-well plates
+5. Put with an anaerobic pouch into an anaerobic sachet
+6. Incubate @37?C for 2h
+7. Add 160?l TYDK with the drug of choice for the correct final C 
+8. Back into sachet with new anaerobic pouch
+9. Incubate for 48h 
+
+#####28.3.19
+10. Thaw GloTiter reagent 1h before use
+11. Equilibrate plates to RT for 30min
+12. Add 50?l of reagent to wells
+13. Shake for 10min @RT
+14. Incubate 10 min @ RT
+15. Luminescence measured in Tecan
+
+
+#Results
+`r Sys.Date()`
+```{r}
+#Now come a lot of operations without text in the output file 
+#Read your file in
+df <- read_csv2("EC50MTZ_12_9_19_1.csv")
+#kable(df)
+
+```
+
+
+```{r}
+#Calculate the background according to plate set-up
+#read find the correct function for my word and include it into this or make it a csv
+Background <-(df[2,4]+df[3,5]+df[4,6]+df[5,7])/4
+#print(Background)
+```
+
+
+```{r}
+#Distract the background from all values in my matrix
+ndf <-df[2:7,2:12]-Background[1,1]
+```
+
+
+```{r}
+#Extract WB values according to plate set-up
+
+ZeroWB <- (ndf[1,2]+ndf[5,6])/2
+OneWB <- (ndf[3,2])
+OneWBZ <- ndf[2,2]
+
+TwoWB <- (ndf[5,2])
+TwoWBZ <- (ndf[4,2])
+
+FiveWB <- (ndf[1,6])
+FiveWBZ <- (ndf[6,2])
+
+TenWB <- (ndf[3,6])
+TenWBZ <- (ndf[2,6])
+
+TwentyWB <- (ndf[1,10])
+TwentyWBZ <- (ndf[6,6])
+
+FiftyWB <- (ndf[5,10])
+FiftyWBZ <- (ndf[3,10])
+```
+
+
+```{r}
+#Extract C6NR values according to plate set-up
+
+ZeroC6NR <- (ndf[2,3]+ndf[3,7])/2
+OneC6NR <- (ndf[4,3])
+OneC6NRZ <- ndf[3,3]
+
+TwoC6NR <- (ndf[6,3])
+TwoC6NRZ <- (ndf[5,3])
+
+FiveC6NR <- (ndf[2,7])
+FiveC6NRZ <- (ndf[1,7])
+
+TenC6NR <- (ndf[5,7])
+TenC6NRZ <- (ndf[4,7])
+
+TwentyC6NR <- (ndf[1,11])
+TwentyC6NRZ <- (ndf[6,7])
+
+FiftyC6NR <- (ndf[5,11])
+FiftyC6NRZ <- (ndf[3,11])
+```
+
+
+```{r}
+#Extract C60.5 values according to plate set-up
+
+ZeroC60.5 <- (ndf[1,4]+ndf[3,8])/2
+OneC60.5 <- (ndf[4,4])
+OneC60.5Z <- ndf[3,4]
+
+TwoC60.5 <- (ndf[6,4])
+TwoC60.5Z <- (ndf[5,4])
+
+FiveC60.5 <- (ndf[2,8])
+FiveC60.5Z <- (ndf[1,8])
+
+TenC60.5 <- (ndf[5,8])
+TenC60.5Z <- (ndf[4,8])
+
+TwentyC60.5 <- (ndf[2,10])
+TwentyC60.5Z <- (ndf[6,8])
+
+FiftyC60.5 <- (ndf[6,10])
+FiftyC60.5Z <- (ndf[4,10])
+```
+
+
+```{r}
+#Extract C6aI values according to plate set-up
+
+ZeroC6aI <- (ndf[1,5]+ndf[3,9])/2
+OneC6aI <- (ndf[4,5])
+OneC6aIZ <- ndf[2,5]
+
+TwoC6aI <- (ndf[6,5])
+TwoC6aIZ <- (ndf[5,5])
+
+FiveC6aI <- (ndf[2,9])
+FiveC6aIZ <- (ndf[1,9])
+
+TenC6aI <- (ndf[5,9])
+TenC6aIZ <- (ndf[4,9])
+
+TwentyC6aI <- (ndf[2,11])
+TwentyC6aIZ <- (ndf[6,9])
+
+FiftyC6aI <- (ndf[6,11])
+FiftyC6aIZ <- (ndf[4,11])
+```
+
+###Survival of strains WB, C6NR, C60.5 and C6aI under the tested drug with the given concentrations
+```{r}
+#Calculate percentages for survival of all strains for the drug tested to have a clear table
+Percent_survival_drug <- tribble(
+  ~"Strain",~"0uM[%]",  ~"1uM[%]", ~"2uM[%]", ~"5uM[%]", ~"10uM[%]", ~"20uM[%]", ~"50uM[%]",
+  #--|--|------
+  "WB", ZeroWB/ZeroWB*100, OneWB/OneWBZ*100, TwoWB/TwoWBZ*100, FiveWB/FiveWBZ*100, TenWB/TenWBZ*100, TwentyWB/TwentyWBZ*100, FiftyWB/FiftyWBZ*100,
+  
+  "C6NR", ZeroC6NR/ZeroC6NR*100, OneC6NR/OneC6NRZ*100, TwoC6NR/TwoC6NRZ*100, FiveC6NR/FiveC6NRZ*100, TenC6NR/TenC6NRZ*100, TwentyC6NR/TwentyC6NRZ*100, FiftyC6NR/FiftyC6NRZ*100,
+  
+  "C60.5",ZeroC60.5/ZeroC60.5*100, OneC60.5/OneC60.5Z*100, TwoC60.5/TwoC60.5Z*100, FiveC60.5/FiveC60.5*100, TenC60.5/TenC60.5Z*100, TwentyC60.5/TwentyC60.5Z*100, FiftyC60.5/FiftyC60.5Z*100,
+  
+  "C6aI", ZeroC6aI/ZeroC6aI*100, OneC6aI/OneC6aIZ*100, TwoC6aI/TwoC6aIZ*100, FiveC6aI/FiveC6aIZ*100, TenC6aI/TenC6aIZ*100, TwentyC6aI/TwentyC6aIZ*100, FiftyC6aI/FiftyC6aIZ*100
+)
+kable(Percent_survival_drug)
+write_csv(Percent_survival_drug, path = "Percent_survival_MTZ_1.csv")
+```
+
+
+```{r}
+#Tribble for easier plotting with one column for C and one for each strain 
+MTZ_1 <- tribble(
+  ~"Conc", ~"WB", ~"C6NR", ~"C60.5", ~"C6aI", 
+   #--|--|----
+  1e-20, ZeroWB/ ZeroWB*100, ZeroC6NR/ ZeroC6NR*100, ZeroC60.5/ ZeroC60.5*100, ZeroC6aI/ ZeroC6aI*100,
+  
+  1, OneWB/ OneWBZ*100, OneC6NR/ OneC6NRZ*100, OneC60.5/ OneC60.5Z*100, OneC6aI/ OneC6aIZ*100,
+  
+  2,  TwoWB/ TwoWBZ*100, TwoC6NR/TwoC6NRZ*100, TwoC60.5/ TwoC60.5Z*100, TwoC6aI/TwoC6aIZ*100,
+  
+  5, FiveWB/ FiveWBZ*100, FiveC6NR/ FiveC6NRZ*100, FiveC60.5/ FiveC60.5Z*100, FiveC6aI/ FiveC6aIZ*100,
+  
+  10, TenWB/ TenWBZ*100, TenC6NR/ TenC6NRZ*100, TenC60.5/ TenC60.5Z*100, TenC6aI/ TenC6aIZ*100,
+  
+  20, TwentyWB/ TwentyWBZ*100, TwentyC6NR/ TwentyC6NRZ*100, TwentyC60.5/ TwentyC60.5Z*100, TwentyC6aI/ TwentyC6aIZ*100,
+  
+  50, FiftyWB/ FiftyWBZ*100, FiftyC6NR/ FiftyC6NRZ*100, FiftyC60.5/ FiftyC60.5Z*100, FiftyC6aI/ FiftyC6aIZ*100
+)
+#print(MTZ_1)
+write_csv(MTZ_1, path = "MTZ_5.csv")
+```
+
+
+##A visualisation of the values
+```{r}
+#See how it looks. Here you can play with the graphs
+
+# Plot it 
+ggplot(MTZ_1)+
+    labs(title ="IC50 MTZ")+
+    ylab("Procent survival MTZ")+
+    xlab("Concentration metronidazole in ?M")+
+    theme(plot.caption = element_text(size = 11))+
+    geom_point (mapping = aes(x = Conc, y = WB), color="red")+
+    geom_point (mapping = aes(x = Conc, y = C6NR), color="blue")+
+    geom_point (mapping = aes(x = Conc, y = C60.5), color="green")+
+    geom_point (mapping = aes(x = Conc, y = C6aI), color="black")+ 
+    stat_smooth(mapping = aes(x = Conc, y = WB), color="red", formula = y ~log10(x))+
+    stat_smooth(mapping = aes(x = Conc, y = C6NR), color="blue", formula = y ~log10(x))+
+    stat_smooth(mapping = aes(x = Conc, y = C60.5), color="green", formula = y ~log10(x))+
+    stat_smooth(mapping = aes(x = Conc, y = C6aI), color="black", formula = y ~log10(x))+
+    theme_bw() +
+    #scale_y_continuous(limits = c(5,100), trans = "log")+
+    scale_y_continuous(limits = c(0.1,100))+
+    scale_x_continuous(limits = c(0, 50))
+    #scale_x_continuous(limits = c(1, 50), trans = "log")
+   
+```
+
+##Resulting IC50 values for the strains tested under our drug concentrations
+
+```{r}
+#Calculate the model for WB
+ modelWB <- lm(log(WB)~Conc, data = MTZ_1)
+
+#summary(modelWB)
+fWB <- round(coef(modelWB) ,2)
+
+eqWB <- paste0("y = ", fWB[1],
+             ifelse(sign(fWB[2])==1, " + ", " - "), abs(fWB[2]), " Conc ")
+
+eWB <- round(solve(fWB[2], log(50)-fWB[1]) ,2)
+
+EC50WB <- paste0("EC50[?M] = ", eWB[1])
+
+ggplot(MTZ_1) + 
+    ylab("Procent survival MTZ WB") + 
+    geom_point (mapping = aes(x = Conc, y = WB), color="red")+
+    theme_bw() +
+    scale_x_continuous(limits = c(0, 50)) +
+    scale_y_continuous(limits = c(0.1,115),trans = "log")+
+    stat_smooth(aes(x = Conc, y = WB), method="lm", color="red")+
+    annotate(geom="text", x=30, y=30, label=eqWB,
+              color="black")+
+    annotate(geom="text", x=40, y=10, label=EC50WB,
+              color="black")
+
+#Calculate the model for C6NR
+ modelC6NR <- lm(log(C6NR)~Conc, data = MTZ_1)
+
+#summary(modelC6NR)
+fC6NR <- round(coef(modelC6NR) ,2)
+
+eqC6NR <- paste0("y = ", fC6NR[1],
+             ifelse(sign(fC6NR[2])==1, " + ", " - "), abs(fC6NR[2]), " Conc ")
+
+eC6NR <- round(solve(fC6NR[2], log(50)-fC6NR[1]) ,2)
+
+EC50C6NR <- paste0("EC50[?M] = ", eC6NR[1])
+
+ggplot(MTZ_1) + 
+    ylab("Procent survival MTZ C6NR") + 
+    geom_point (mapping = aes(x = Conc, y = C6NR), color="blue")+
+    theme_bw() +
+    scale_x_continuous(limits = c(0, 50)) +
+    scale_y_continuous(limits = c(0.1,115),trans = "log")+
+    stat_smooth(aes(x = Conc, y = C6NR), method="lm", color="blue")+
+    annotate(geom="text", x=30, y=30, label=eqC6NR,
+              color="black")+
+    annotate(geom="text", x=40, y=10, label=EC50C6NR,
+              color="black")
+
+#Calculate the model for C60.5
+ modelC60.5 <- lm(log(C60.5)~Conc, data = MTZ_1)
+
+#summary(modelC60.5)
+fC60.5 <- round(coef(modelC60.5) ,2)
+
+eqC60.5 <- paste0("y = ", fC60.5[1],
+             ifelse(sign(fC60.5[2])==1, " + ", " - "), abs(fC60.5[2]), " Conc ")
+
+eC60.5 <- round(solve(fC60.5[2], log(50)-fC60.5[1]) ,2)
+
+EC50C60.5 <- paste0("EC50[?M] = ", eC60.5[1])
+
+ggplot(MTZ_1) + 
+    ylab("Procent survival MTZ C60.5") + 
+    geom_point (mapping = aes(x = Conc, y = C60.5), color="green")+
+    theme_bw() +
+    scale_x_continuous(limits = c(0, 50)) +
+    scale_y_continuous(limits = c(0.1,115),trans = "log")+
+    stat_smooth(aes(x = Conc, y = C60.5), method="lm", color="green")+
+    annotate(geom="text", x=30, y=5, label=eqC60.5,
+              color="black")+
+    annotate(geom="text", x=40, y=2, label=EC50C60.5,
+              color="black")
+
+#Calculate the model for C6aI
+ modelC6aI <- lm(log(C6aI)~Conc, data = MTZ_1)
+
+#summary(modelC6aI)
+fC6aI <- round(coef(modelC6aI) ,2)
+
+eqC6aI <- paste0("y = ", fC6aI[1],
+             ifelse(sign(fC6aI[2])==1, " + ", " - "), abs(fC6aI[2]), " Conc ")
+
+eC6aI <- round(solve(fC6aI[2], log(50)-fC6aI[1]) ,2)
+
+EC50C6aI <- paste0("EC50[?M] = ", eC6aI[1])
+
+ggplot(MTZ_1) + 
+    ylab("Procent survival MTZ C6aI") + 
+    geom_point (mapping = aes(x = Conc, y = C6aI), color="black")+
+    theme_bw() +
+    scale_x_continuous(limits = c(0, 50)) +
+    scale_y_continuous(limits = c(0.1,115),trans = "log")+
+    stat_smooth(aes(x = Conc, y = C6aI), method="lm", color="black")+
+    annotate(geom="text", x=30, y=5, label=eqC6aI,
+              color="black")+
+    annotate(geom="text", x=40, y=2, label=EC50C6aI,
+              color="black")
+
+EC50valuesMTZ_1_8_8_19 <- tribble(
+   ~" ", ~"WB", ~"C6NR", ~"C60.5", ~"C6aI", 
+   #--|--|----
+  "EC50[?M]", eWB, eC6NR, eC60.5, eC6aI)
+
+kable(EC50valuesMTZ_1_8_8_19)
+write_csv(EC50valuesMTZ_1_8_8_19, path = "EC50MTZ_1_12_9_19.csv")
+```
+
+
+
+#Dicussion and conclusion
+Talk about what these results mean and what the next steps are 
+
+
