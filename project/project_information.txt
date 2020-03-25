@@ -1,0 +1,21 @@
+In one of my projects I record luminescence in wells of a 96-well plate in a plate reader. This luminescence corresponds to the amount of life cells in a given well and is initially stored in an excel file. 
+
+I have written a script in R to match the given values for any well with a clear identifier, followed by calculation of survival rates at different condition. These survival rates are used to establish an IC50, that is the point where 50% of cells are alive in comparison to a mock well. A graphical view of the data is presented as well and as next step, once data collection is complete, statistical analysis should also be included. 
+
+The R script can be found in the R-markdown file in this folder. 
+
+
+As my project I would like to transfer this script or at least a part of it into python while at the same time optimising it. 
+
+I will put special focus on the I match my matrix values with their identifier. 
+In R I simple defined them via the absolute position in the matrix. This works fine if you have identical set-up for every plate but gets time consuming if you have to change any position and always have to double check that you are still addressing the correct well. 
+
+
+Hence I would like to try and set-up a system where I can address the positions in the matrix via their A-G and 1-12 identifiers, so for example by giving that wild type(wt) mock is B3.  Preferably this should be in a way that I can even define a whole stretch as for example wt cells (like B2-10 are wt) and than add the second level of information on it- B3 is mock, B4 is compound 1 10µM etc. 
+
+
+This information can be used in a parallel way to what I coded in R to calculate survival rates, from in turn which IC50 values can be established. In this next step more automation would be great since I right now still have to interpret the graph to find a suitable part of it to model on. If I have the time in this project I would try to see if I can solve this in an easier way in python. 
+
+
+
+
